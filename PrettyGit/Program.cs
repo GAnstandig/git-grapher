@@ -1,9 +1,6 @@
 ﻿using SixLabors.Fonts;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 
 using System;
 using System.Collections.Generic;
@@ -15,18 +12,6 @@ namespace PrettyGit
 {
     public class Program
     {
-        public static float imageWidth = 1920;
-        public static float originalWidth = 1920;
-
-        public static float imageHeight = 1080;
-        public static float originalHeight = 1080;
-
-        public static float xOffset;
-
-        public static Image Image;
-
-        
-
         static void Main(string[] args)
         {
             string response = string.Empty;
@@ -66,7 +51,7 @@ namespace PrettyGit
                 MinimumHorizontalClearance = 20,
                 MinimumVerticalClearance = 200,
                 ScaleValuesOnResize = true,
-                ScaleImageAxesIndepentently = false
+                ScaleImageAxesIndepentently = true
             };
 
             imageOptions.Colors = colorChoice.IsNumeric()
