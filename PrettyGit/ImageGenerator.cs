@@ -49,8 +49,8 @@ namespace PrettyGit
             SetColors(pointGroups);
 
             Image image = new Image<Rgba32>(
-                    imageOptions.InitialWidth * widthMultiplier, 
-                    imageOptions.InitialHeight * heightMultiplier, 
+                    imageOptions.InitialWidth * widthMultiplier,
+                    imageOptions.InitialHeight * heightMultiplier,
                     imageOptions.BackgroundColor
                 );
 
@@ -78,12 +78,12 @@ namespace PrettyGit
                 {
                     currentColor = rng.Next(0, imageOptions.Colors.Count);
                 } while (
-                    group.First().Parents.Any(x=> 
+                    group.First().Parents.Any(x =>
                         imageOptions.Colors.IndexOf(x.Color) == currentColor
-                        || x.Children.Where(y=>!group.Contains(x))
-                            .Any(y=> imageOptions.Colors.IndexOf(y.Color) == currentColor)
+                        || x.Children.Where(y => !group.Contains(x))
+                            .Any(y => imageOptions.Colors.IndexOf(y.Color) == currentColor)
                     )
-                || group.Last().Children.Any(x=> imageOptions.Colors.IndexOf(x.Color) == currentColor
+                || group.Last().Children.Any(x => imageOptions.Colors.IndexOf(x.Color) == currentColor
                         || x.Parents.Where(y => !group.Contains(x))
                             .Any(y => imageOptions.Colors.IndexOf(y.Color) == currentColor)
                         )
@@ -123,7 +123,7 @@ namespace PrettyGit
             foreach (Point p in points)
             {
                 //assign X axis value
-                p.xPosition = p.xOffset/(float)points.Count * (imageOptions.InitialWidth * widthMultiplier) - pointOffsetX;
+                p.xPosition = p.xOffset / (float)points.Count * (imageOptions.InitialWidth * widthMultiplier) - pointOffsetX;
 
                 //assign Y axis value
                 p.yPosition = bottomLine - ((p.yOffset * imageOptions.VerticalBranchSpacing)); //subtract to move upward
@@ -136,9 +136,9 @@ namespace PrettyGit
             if (pointOffsetX < imageOptions.MinimumHorizontalClearance)
             {
                 widthMultiplier = (int)Math.Ceiling((imageOptions.MinimumHorizontalClearance * imagePoints.Count * 2) / (double)imageOptions.InitialWidth);
-                pointOffsetX = (imageOptions.InitialWidth*widthMultiplier) / (imagePoints.Count * 2);
+                pointOffsetX = (imageOptions.InitialWidth * widthMultiplier) / (imagePoints.Count * 2);
             }
-            
+
             //get the height of highest branch
             int imageHeight = imageOptions.InitialHeight;
             if (titleOptions is not null && accountForTitle)
@@ -268,7 +268,10 @@ namespace PrettyGit
 
             float xOffset;
             float yOffset;
-
+            
+            int scaledHeight = imageOptions.InitialHeight * heightMultiplier;
+            int scaledWidth = imageOptions.InitialWidth * widthMultiplier;
+            
             switch (titleOptions.Position)
             {
                 case TitleOptions.Location.TopLeft:
@@ -278,44 +281,44 @@ namespace PrettyGit
                     titleOptions.VerticalAlignment = VerticalAlignment.Top;
                     break;
                 case TitleOptions.Location.TopCenter:
-                    xOffset = imageOptions.InitialWidth / 2;
+                    xOffset = scaledWidth / 2;
                     yOffset = 0 + titleOptions.YOffset;
                     titleOptions.HorizontalAlignment = HorizontalAlignment.Center;
                     titleOptions.VerticalAlignment = VerticalAlignment.Top;
                     break;
                 case TitleOptions.Location.TopRight:
-                    xOffset = imageOptions.InitialWidth - titleOptions.XOffset;
+                    xOffset = scaledWidth - titleOptions.XOffset;
                     yOffset = 0 + titleOptions.YOffset;
                     titleOptions.HorizontalAlignment = HorizontalAlignment.Right;
                     titleOptions.VerticalAlignment = VerticalAlignment.Top;
                     break;
                 case TitleOptions.Location.RightEdge:
-                    xOffset = imageOptions.InitialWidth - titleOptions.XOffset;
-                    yOffset = imageOptions.InitialHeight / 2;
+                    xOffset = scaledWidth - titleOptions.XOffset;
+                    yOffset = scaledHeight / 2;
                     titleOptions.HorizontalAlignment = HorizontalAlignment.Right;
                     titleOptions.VerticalAlignment = VerticalAlignment.Center;
                     break;
                 case TitleOptions.Location.BottomRight:
-                    xOffset = imageOptions.InitialWidth - titleOptions.XOffset;
-                    yOffset = imageOptions.InitialHeight - titleOptions.YOffset;
+                    xOffset = scaledWidth - titleOptions.XOffset;
+                    yOffset = scaledHeight - titleOptions.YOffset;
                     titleOptions.HorizontalAlignment = HorizontalAlignment.Right;
                     titleOptions.VerticalAlignment = VerticalAlignment.Bottom;
                     break;
                 case TitleOptions.Location.BottomCenter:
-                    xOffset = imageOptions.InitialWidth / 2;
-                    yOffset = imageOptions.InitialHeight - titleOptions.YOffset;
+                    xOffset = scaledWidth / 2;
+                    yOffset = scaledHeight - titleOptions.YOffset;
                     titleOptions.HorizontalAlignment = HorizontalAlignment.Center;
                     titleOptions.VerticalAlignment = VerticalAlignment.Bottom;
                     break;
                 case TitleOptions.Location.BottomLeft:
                     xOffset = 0 + titleOptions.XOffset;
-                    yOffset = imageOptions.InitialHeight - titleOptions.YOffset;
+                    yOffset = scaledHeight - titleOptions.YOffset;
                     titleOptions.HorizontalAlignment = HorizontalAlignment.Left;
                     titleOptions.VerticalAlignment = VerticalAlignment.Bottom;
                     break;
                 case TitleOptions.Location.LeftEdge:
                     xOffset = 0 + titleOptions.XOffset;
-                    yOffset = imageOptions.InitialHeight / 2;
+                    yOffset = scaledHeight / 2;
                     titleOptions.HorizontalAlignment = HorizontalAlignment.Left;
                     titleOptions.VerticalAlignment = VerticalAlignment.Center;
                     break;
@@ -328,7 +331,7 @@ namespace PrettyGit
                 TextOptions = titleOptions
             };
 
-            image.Mutate(x => x.DrawText(tgo, title, titleOptions.Font, titleOptions.Color, new PointF(xOffset * widthMultiplier, yOffset * heightMultiplier)));
+            image.Mutate(x => x.DrawText(tgo, title, titleOptions.Font, titleOptions.Color, new PointF(xOffset, yOffset)));
         }
 
         private void DrawGraph(Image image, List<Point> points)
