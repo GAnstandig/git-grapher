@@ -74,11 +74,14 @@ namespace PrettyGit
             int currentColor = 0;
             foreach (List<Point> group in pointGroups)
             {
+                int maxIterations = 50;
+                int iters = 0;
                 do
                 {
                     currentColor = rng.Next(0, imageOptions.Colors.Count);
+                    iters++;
                 } while (
-                    group.First().Parents.Any(x =>
+                    (group.First().Parents.Any(x =>
                         imageOptions.Colors.IndexOf(x.Color) == currentColor
                         || x.Children.Where(y => !group.Contains(x))
                             .Any(y => imageOptions.Colors.IndexOf(y.Color) == currentColor)
@@ -86,7 +89,8 @@ namespace PrettyGit
                 || group.Last().Children.Any(x => imageOptions.Colors.IndexOf(x.Color) == currentColor
                         || x.Parents.Where(y => !group.Contains(x))
                             .Any(y => imageOptions.Colors.IndexOf(y.Color) == currentColor)
-                        )
+                        ))
+                && iters < maxIterations
                 );
 
                 foreach (Point p in group)
