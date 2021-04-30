@@ -268,10 +268,10 @@ namespace PrettyGit
 
             float xOffset;
             float yOffset;
-            
+
             int scaledHeight = imageOptions.InitialHeight * heightMultiplier;
             int scaledWidth = imageOptions.InitialWidth * widthMultiplier;
-            
+
             switch (titleOptions.Position)
             {
                 case TitleOptions.Location.TopLeft:

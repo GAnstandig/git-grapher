@@ -50,7 +50,7 @@ namespace PrettyGit
         /// Sets whether axis scales are coupled or indepentent. Defaults to true
         /// </summary>
         public bool ScaleImageAxesIndepentently { get; set; } = true;
-        
-        
+
+
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace PrettyGit
 {
@@ -24,7 +23,7 @@ namespace PrettyGit
                     (x.StartPoint <= target.StartPoint &&
                     x.EndPoint >= target.StartPoint)
                     || (x.StartPoint <= target.StartPoint &&
-                    x.EndPoint >= target.StartPoint) 
+                    x.EndPoint >= target.StartPoint)
                     || (x.StartPoint <= target.EndPoint &&
                     x.EndPoint >= target.EndPoint)
                     || (x.StartPoint >= target.StartPoint &&
@@ -41,9 +40,5 @@ namespace PrettyGit
             return byte.Parse(value);
         }
 
-        public static bool IsNumeric(this string value)
-        {
-            return !Regex.IsMatch(value, @"[a-zA-Z]");
-        }
     }
 }

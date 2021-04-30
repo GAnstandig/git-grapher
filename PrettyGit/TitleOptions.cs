@@ -13,23 +13,23 @@ namespace PrettyGit
         public float XOffset { get; set; }
         public float YOffset { get; set; }
 
-        public TitleOptions(Font font):base()
+        public TitleOptions(Font font) : base()
         {
             Font = font;
         }
 
-        public enum Location 
+        public enum Location
         {
             TopLeft,
             TopCenter,
             TopRight,
 
             RightEdge,
-            
+
             BottomRight,
             BottomCenter,
             BottomLeft,
-            
+
             LeftEdge
         }
     }

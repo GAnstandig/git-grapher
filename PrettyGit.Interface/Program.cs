@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace PrettyGit
+namespace PrettyGit.Interface
 {
     public class Program
     {

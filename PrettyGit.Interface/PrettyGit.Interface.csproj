@@ -1,16 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LangVersion>9</LangVersion>
-    <Nullable>enable</Nullable>
-    <Platforms>AnyCPU;x64</Platforms>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PrettyGit\PrettyGit.Core.csproj" />
   </ItemGroup>
 
 </Project>
