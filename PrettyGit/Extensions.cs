@@ -21,8 +21,14 @@ namespace PrettyGit
         {
             Range? value = collection.Where
                 (x =>
-                    x.StartPoint <= target.StartPoint &&
-                    x.EndPoint >= target.StartPoint
+                    (x.StartPoint <= target.StartPoint &&
+                    x.EndPoint >= target.StartPoint)
+                    || (x.StartPoint <= target.StartPoint &&
+                    x.EndPoint >= target.StartPoint) 
+                    || (x.StartPoint <= target.EndPoint &&
+                    x.EndPoint >= target.EndPoint)
+                    || (x.StartPoint >= target.StartPoint &&
+                    x.EndPoint <= target.EndPoint)
                 )
                 .OrderByDescending(x => x.YOffset)
                 .FirstOrDefault();
