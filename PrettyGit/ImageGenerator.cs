@@ -70,32 +70,28 @@ namespace PrettyGit
 
         private void SetColors(List<List<Point>> pointGroups)
         {
-            Random rng = new Random();
-            int currentColor = 0;
+            Random rng = new();
+            Dictionary<Color, int> occurrencesByColor = new();
+
+            foreach (Color color in imageOptions.Colors)
+            {
+                occurrencesByColor.Add(color, 0);
+            }
+
             foreach (List<Point> group in pointGroups)
             {
-                int maxIterations = 50;
-                int iters = 0;
-                do
-                {
-                    currentColor = rng.Next(0, imageOptions.Colors.Count);
-                    iters++;
-                } while (
-                    (group.First().Parents.Any(x =>
-                        imageOptions.Colors.IndexOf(x.Color) == currentColor
-                        || x.Children.Where(y => !group.Contains(x))
-                            .Any(y => imageOptions.Colors.IndexOf(y.Color) == currentColor)
-                    )
-                || group.Last().Children.Any(x => imageOptions.Colors.IndexOf(x.Color) == currentColor
-                        || x.Parents.Where(y => !group.Contains(x))
-                            .Any(y => imageOptions.Colors.IndexOf(y.Color) == currentColor)
-                        ))
-                && iters < maxIterations
-                );
+                List<Color> rarestColors = occurrencesByColor
+                    .Where(x => x.Value == occurrencesByColor[occurrencesByColor.OrderByDescending(y => y.Value).Last().Key])
+                    .Select(x => x.Key)
+                    .ToList();
 
+                Color nextColor = rarestColors.ElementAt(rng.Next(0, rarestColors.Count - 1));
+
+                occurrencesByColor[nextColor]++;
+                
                 foreach (Point p in group)
                 {
-                    p.Color = imageOptions.Colors.ElementAt(currentColor);
+                    p.Color = nextColor;
                 }
             }
         }
