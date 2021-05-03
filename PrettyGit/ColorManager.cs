@@ -1,9 +1,13 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+
+using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using System.IO;
 
 namespace PrettyGit
 {
@@ -91,13 +95,27 @@ namespace PrettyGit
             }
         };
 
-        public static List<Color> GetColors(XDocument colorDocument)
+        public static List<Color> GetColors(XDocument xmlDocument)
         {
             List<Color> colors = new();
-            foreach (XElement color in colorDocument.Root.Descendants("color"))
+            foreach (XElement color in xmlDocument.Root.Descendants("color"))
             {
                 colors.Add(new Color(new Rgb24(color.Attribute("r").Value.ToByte(), color.Attribute("g").Value.ToByte(), color.Attribute("b").Value.ToByte())));
             }
+
+            return colors;
+        }
+
+        public static List<Color> GetColors(string colorData) 
+        {
+            JObject colorJsonData = JObject.Parse(File.ReadAllText(colorData));
+            List<Color> colors = colorJsonData["Colors"].Select(x => new Color(
+                new Rgb24(
+                    byte.Parse(x["R"]?.ToString() ?? "0"), 
+                    byte.Parse(x["G"]?.ToString() ?? "0"), 
+                    byte.Parse(x["B"]?.ToString() ?? "0"))
+                )
+            ).ToList();
 
             return colors;
         }

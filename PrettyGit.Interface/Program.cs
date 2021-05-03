@@ -54,9 +54,18 @@ namespace PrettyGit.Interface
                 ScaleImageAxesIndepentently = true
             };
 
-            imageOptions.Colors = colorChoice.IsNumeric()
-                ? ColorManager.GetPreset(int.Parse(colorChoice))
-                : ColorManager.GetColors(XmlManager.GetDocument(colorChoice));
+            if (colorChoice.IsNumeric())
+            {
+                imageOptions.Colors = ColorManager.GetPreset(int.Parse(colorChoice));
+            }
+            else
+            {
+                imageOptions.Colors = Path.GetExtension(colorChoice) switch
+                {
+                    ".xml" => ColorManager.GetColors(XmlManager.GetDocument(colorChoice)),
+                    ".json" => ColorManager.GetColors(colorChoice)
+                };
+            }
 
             TitleOptions titleOptions = new TitleOptions(font)
             {
