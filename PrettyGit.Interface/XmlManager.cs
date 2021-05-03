@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace PrettyGit
+namespace PrettyGit.Interface
 {
     public static class XmlManager
     {
