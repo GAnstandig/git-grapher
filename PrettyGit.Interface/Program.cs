@@ -1,4 +1,6 @@
-﻿using SixLabors.Fonts;
+﻿using CommandLineParser.Exceptions;
+
+using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -12,36 +14,32 @@ namespace PrettyGit.Interface
 {
     public class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            string response = string.Empty;
-
-            if (args.Length < 1 || string.IsNullOrEmpty(args[0]))
+            CommandLineParser.CommandLineParser parser = new()
             {
-                while (string.IsNullOrEmpty(response))
-                {
-                    Console.WriteLine(@"enter path for git log file file {git log --all --date-order --pretty=""%h|%p|""}: ");
-                    response = Console.ReadLine();
-                }
-            }
-            else
-            {
-                response = args[0];
-            }
+                IgnoreCase = true,
+                AcceptEqualSignSyntaxForValueArguments = true,
+                AcceptHyphen = true,
+                ShowUsageOnEmptyCommandline = true,
+            };
 
-            List<Point> points = GetPointsFromLog(response);
-            points.Reverse();
+            Arguments arguments = new();
+
+            try
+            {
+                parser.ExtractArgumentAttributes(arguments);
+                parser.ParseCommandLine(args);
+            }
+            catch (CommandLineArgumentException e)
+            {
+                Console.WriteLine($"Error parsing argument \"{e.Argument}\": {e.Message}");
+                return -1;
+            }
+            
 
             Font font = new(SystemFonts.Find("consolas"), 55, FontStyle.BoldItalic);
-            Console.Write(@"Enter a title for this work, or leave blank: ");
-            string title = Console.ReadLine();
 
-            Console.Write(@"Enter number for preset, or a path for a color file: ");
-            string colorChoice = Console.ReadLine();
-            if (string.IsNullOrEmpty(colorChoice))
-            {
-                colorChoice = "0";
-            }
             ImageOptions imageOptions = new()
             {
                 InitialWidth = 1920,
@@ -54,6 +52,47 @@ namespace PrettyGit.Interface
                 ScaleImageAxesIndepentently = true
             };
 
+            TitleOptions titleOptions = new(font)
+            {
+                Color = new Rgb24(170, 170, 170),
+                Position = TitleOptions.Location.BottomRight,
+                XOffset = 50,
+                YOffset = 50
+            };
+
+            Arguments.ApplyCustomizations(arguments, ref imageOptions, ref titleOptions);
+
+            string response = arguments.FilePathToReadFrom?.FullName ?? string.Empty;
+
+            while (string.IsNullOrEmpty(response))
+            {
+                Console.WriteLine(@"enter path for git log file file {git log --all --date-order --pretty=""%h|%p|""}: ");
+                response = Console.ReadLine();
+            }
+
+            List<Point> points = GetPointsFromLog(response);
+            points.Reverse();
+
+            string title = arguments.ImageTitle ?? string.Empty;
+
+            while (string.IsNullOrEmpty(title))
+            {
+                Console.Write(@"Enter a title for this work, or leave blank: ");
+                title = Console.ReadLine();
+            }
+
+            string colorChoice = arguments.ColorPalette ?? string.Empty;
+
+            if (string.IsNullOrEmpty(colorChoice))
+            {
+                Console.Write(@"Enter number for preset, or a path for a color file: ");
+                colorChoice = Console.ReadLine();
+                if (string.IsNullOrEmpty(colorChoice))
+                {
+                    colorChoice = "0";
+                }
+            }
+
             if (colorChoice.IsNumeric())
             {
                 imageOptions.Colors = ColorManager.GetPreset(int.Parse(colorChoice));
@@ -63,17 +102,10 @@ namespace PrettyGit.Interface
                 imageOptions.Colors = Path.GetExtension(colorChoice) switch
                 {
                     ".xml" => ColorManager.GetColors(XmlManager.GetDocument(colorChoice)),
-                    ".json" => ColorManager.GetColors(colorChoice)
+                    ".json" => ColorManager.GetColors(colorChoice),
+                    _ => throw new NotImplementedException()
                 };
             }
-
-            TitleOptions titleOptions = new TitleOptions(font)
-            {
-                Color = new Rgb24(170, 170, 170),
-                Position = TitleOptions.Location.BottomRight,
-                XOffset = 50,
-                YOffset = 50
-            };
 
             ImageGenerator generator = new ImageGenerator(imageOptions, titleOptions);
 
@@ -87,6 +119,8 @@ namespace PrettyGit.Interface
             {
                 image.SaveAsPng($"{title}.png");
             }
+
+            return 0;
         }
 
         private static List<Point> GetPointsFromLog(string logPath)
