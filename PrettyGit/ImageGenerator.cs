@@ -151,7 +151,7 @@ namespace PrettyGit
 
             if (distanceToEdge < imageOptions.MinimumVerticalClearance)
             {
-                heightMultiplier = (int)Math.Ceiling((imagePoints.Max(x => x.yOffset) * imageOptions.VerticalBranchSpacing + imageHeight) / (double)imageOptions.InitialHeight);
+                heightMultiplier = (int)Math.Ceiling((imagePoints.Max(x => x.yOffset) * imageOptions.VerticalBranchSpacing + imageOptions.MinimumVerticalClearance) / (double)imageOptions.InitialHeight);
             }
 
             if (!scaleImageAxesIndepentently)
