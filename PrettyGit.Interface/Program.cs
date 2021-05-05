@@ -36,7 +36,12 @@ namespace PrettyGit.Interface
                 Console.WriteLine($"Error parsing argument \"{e.Argument}\": {e.Message}");
                 return -1;
             }
-            
+
+            if (!args.Any())
+            {
+
+                return 0;
+            }
 
             Font font = new(SystemFonts.Find("consolas"), 55, FontStyle.BoldItalic);
 
@@ -62,36 +67,14 @@ namespace PrettyGit.Interface
 
             Arguments.ApplyCustomizations(arguments, ref imageOptions, ref titleOptions);
 
-            string response = arguments.FilePathToReadFrom?.FullName ?? string.Empty;
+            string sourceFile = arguments.FilePathToReadFrom?.FullName ?? string.Empty;
 
-            while (string.IsNullOrEmpty(response))
-            {
-                Console.WriteLine(@"enter path for git log file file {git log --all --date-order --pretty=""%h|%p|""}: ");
-                response = Console.ReadLine();
-            }
-
-            List<Point> points = GetPointsFromLog(response);
+            List<Point> points = GetPointsFromLog(sourceFile);
             points.Reverse();
 
             string title = arguments.ImageTitle ?? string.Empty;
 
-            while (string.IsNullOrEmpty(title))
-            {
-                Console.Write(@"Enter a title for this work, or leave blank: ");
-                title = Console.ReadLine();
-            }
-
             string colorChoice = arguments.ColorPalette ?? string.Empty;
-
-            if (string.IsNullOrEmpty(colorChoice))
-            {
-                Console.Write(@"Enter number for preset, or a path for a color file: ");
-                colorChoice = Console.ReadLine();
-                if (string.IsNullOrEmpty(colorChoice))
-                {
-                    colorChoice = "0";
-                }
-            }
 
             if (colorChoice.IsNumeric())
             {

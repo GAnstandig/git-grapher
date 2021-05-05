@@ -8,6 +8,9 @@ namespace PrettyGit.Interface
 {
     internal class Arguments
     {
+        [FileArgument("filePath", Description = @"Path to the file containing repository log data. {git log --all --date-order --pretty=""%h|%p|"" > [file name here]}", FileMustExist = true, Optional = false)]
+        public FileInfo FilePathToReadFrom;
+
         [ValueArgument(typeof(int), "initialWidth", Description = "Starting width of the image.", DefaultValue = 1920)]
         public int ImageWidth;
 
@@ -42,9 +45,6 @@ namespace PrettyGit.Interface
 
         [ValueArgument(typeof(int), "verticalTitleOffset", Description = "Distance from the top or bottom edge of the document to the title.", DefaultValue = 50)]
         public int VerticalOffset;
-
-        [FileArgument("filePath", Description = "Path to the file containing repository log data", FileMustExist = true)]
-        public FileInfo FilePathToReadFrom;
 
         [ValueArgument(typeof(string), "title", Description = "Title of the image")]
         public string ImageTitle;
