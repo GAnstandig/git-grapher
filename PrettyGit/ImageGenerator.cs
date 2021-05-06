@@ -88,7 +88,7 @@ namespace PrettyGit
                 Color nextColor = rarestColors.ElementAt(rng.Next(0, rarestColors.Count - 1));
 
                 occurrencesByColor[nextColor]++;
-                
+
                 foreach (Point p in group)
                 {
                     p.Color = nextColor;
@@ -179,6 +179,7 @@ namespace PrettyGit
             Point originPoint = points.First();
             Point finalPoint = points.Last();
 
+            List<Point> endpoints = points.Where(x => !x.Children.Any()).Except(new List<Point>() { points.Last() }).ToList();
             List<Point> unassignedPoints = new(points);
 
             List<List<Point>> branches = new();
@@ -191,10 +192,14 @@ namespace PrettyGit
                 {
                     branch = values;
                 }
+                else if (unassignedPoints.First().Children.Any())
+                {
+                    List<List<Point>> potentialPaths = endpoints.Select(x => Utilities.GetShortestPath(unassignedPoints.First(), x) ?? new List<Point>()).ToList();
+                    branch = potentialPaths.OrderBy(x => x.Count).First(x => x.Count > 0);
+                }
                 else
                 {
                     branch = new List<Point>() { unassignedPoints.First() };
-                    unassignedPoints.RemoveAt(0);
                 }
 
                 unassignedPoints.RemoveRange(branch);
@@ -217,7 +222,7 @@ namespace PrettyGit
 
                 if (count >= branch.Count - 1)
                 {
-                    endPosition = newBranch.Last().xOffset;
+                    endPosition = branch.Last().xOffset;
                 }
                 else
                 {
@@ -379,8 +384,8 @@ namespace PrettyGit
 
                             image.Mutate(y => y.DrawBeziers(Pens.Solid(lineColor, 12),
                             offsetLocation,
-                            new PointF(offsetLocation.X + pointOffsetX, offsetLocation.Y),
-                            new PointF(x.xPosition - pointOffsetX, x.yPosition),
+                            new PointF(offsetLocation.X + (2 * pointOffsetX), offsetLocation.Y),
+                            new PointF(x.xPosition - (2 * pointOffsetX), x.yPosition),
                             x.Location));
                         }
                     }
@@ -388,8 +393,8 @@ namespace PrettyGit
                     {
                         image.Mutate(y => y.DrawBeziers(Pens.Solid(lineColor, 12),
                         point.Location,
-                        new PointF(point.xPosition + pointOffsetX, point.yPosition),
-                        new PointF(x.xPosition - pointOffsetX, x.yPosition),
+                        new PointF(point.xPosition + (2 * pointOffsetX), point.yPosition),
+                        new PointF(x.xPosition - (2 * pointOffsetX), x.yPosition),
                         x.Location));
                     }
                 });
