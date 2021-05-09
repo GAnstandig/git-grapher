@@ -91,14 +91,19 @@ namespace PrettyGit.Interface
 
             Image image = generator.GetImage(points, title);
 
-            if (string.IsNullOrEmpty(title))
+            string outFilePath = string.Empty;
+            if (!string.IsNullOrEmpty(arguments.OutputDirectory))
             {
-                image.SaveAsPng($"{DateTime.Now:yyyy_MM_dd_HHmmss}.png");
+                outFilePath = arguments.OutputDirectory;
             }
-            else
+            
+            string fileName = $"{DateTime.Now:yyyy_MM_dd_HHmmss}";
+            if (!string.IsNullOrEmpty(title))
             {
-                image.SaveAsPng($"{title}.png");
+                fileName = title;
             }
+            
+            image.SaveAsPng(Path.Combine(outFilePath, fileName)+".png");
 
             return 0;
         }

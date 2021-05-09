@@ -37,6 +37,9 @@ namespace PrettyGit.Interface
         [RegexValueArgument("titleColor", @"(\d+\,?){4}", Description = "Color of the title for the image", SampleValue = "70,70,70,255")]
         public string TitleColor;
 
+        [ValueArgument(typeof(string), "outputDirectory", Description = "Directory to save graphic to")]
+        public string OutputDirectory;
+
         [EnumeratedValueArgument(typeof(TitleOptions.Location), "titlePosition", DefaultValue = TitleOptions.Location.BottomRight)]
         public TitleOptions.Location TitleLocation;
 
