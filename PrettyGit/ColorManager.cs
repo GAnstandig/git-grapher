@@ -1,13 +1,11 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-using Newtonsoft.Json.Linq;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace PrettyGit
 {
@@ -95,27 +93,58 @@ namespace PrettyGit
             }
         };
 
-        public static List<Color> GetColors(XDocument xmlDocument)
+        public static List<Color> GetColors(StreamReader inputStream) 
         {
             List<Color> colors = new();
-            foreach (XElement color in xmlDocument.Root.Descendants("color"))
+            
+            Regex hexCode = new(@"([\da-f]{6})", RegexOptions.IgnoreCase);
+            
+            Regex hexAttribute = new(@"(?<=<.*?\s)rgb=['""]([\da - f]{6})['""]", RegexOptions.IgnoreCase);
+            Regex rgbAttributes = new(@"(r|g|b)""?[=:]['""](\d+)['""]", RegexOptions.IgnoreCase);
+            
+            Regex rgbaCode = new(@"(?<=rgba\(\s?)(\d+),\s?(\d+),\s?(\d+)", RegexOptions.IgnoreCase);
+            Regex rgbCode = new(@"(?<=rgb\(\s?)(\d+),\s?(\d+),\s?(\d+)", RegexOptions.IgnoreCase);
+
+            while (!inputStream.EndOfStream)
             {
-                colors.Add(new Color(new Rgb24(color.Attribute("r").Value.ToByte(), color.Attribute("g").Value.ToByte(), color.Attribute("b").Value.ToByte())));
+                string? line = inputStream.ReadLine();
+
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+                else if (hexCode.IsMatch(line))
+                {
+                    colors.Add(Color.ParseHex(hexCode.Match(line).Value));
+                }
+                else if (hexAttribute.IsMatch(line))
+                {
+                    colors.Add(Color.ParseHex(hexAttribute.Match(line).Value));
+                }
+                else if (rgbAttributes.IsMatch(line))
+                {
+                    byte r, g, b;
+                    MatchCollection matches = rgbAttributes.Matches(line);
+                    r = byte.Parse(matches.First(x => x.Groups[1].Value.ToLowerInvariant().Equals("r")).Groups[2].Value);
+                    g = byte.Parse(matches.First(x => x.Groups[1].Value.ToLowerInvariant().Equals("g")).Groups[2].Value);
+                    b = byte.Parse(matches.First(x => x.Groups[1].Value.ToLowerInvariant().Equals("b")).Groups[2].Value);
+                    colors.Add(Color.FromRgb(r, g, b));
+                }
+                else if (rgbaCode.IsMatch(line))
+                {
+                    Match val = rgbaCode.Match(line);
+                    colors.Add(Color.FromRgb(byte.Parse(val.Groups[1].Value), byte.Parse(val.Groups[2].Value), byte.Parse(val.Groups[3].Value)));
+                }
+                else if (rgbCode.IsMatch(line))
+                {
+                    Match val = rgbCode.Match(line);
+                    colors.Add(Color.FromRgb(byte.Parse(val.Groups[1].Value), byte.Parse(val.Groups[2].Value), byte.Parse(val.Groups[3].Value)));
+                }
+                else
+                {
+                    continue;
+                }
             }
-
-            return colors;
-        }
-
-        public static List<Color> GetColors(string colorData) 
-        {
-            JObject colorJsonData = JObject.Parse(File.ReadAllText(colorData));
-            List<Color> colors = colorJsonData["Colors"].Select(x => new Color(
-                new Rgb24(
-                    byte.Parse(x["R"]?.ToString() ?? "0"), 
-                    byte.Parse(x["G"]?.ToString() ?? "0"), 
-                    byte.Parse(x["B"]?.ToString() ?? "0"))
-                )
-            ).ToList();
 
             return colors;
         }

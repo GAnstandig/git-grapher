@@ -82,12 +82,9 @@ namespace PrettyGit.Interface
             }
             else
             {
-                imageOptions.Colors = Path.GetExtension(colorChoice) switch
-                {
-                    ".xml" => ColorManager.GetColors(XmlManager.GetDocument(colorChoice)),
-                    ".json" => ColorManager.GetColors(colorChoice),
-                    _ => throw new NotImplementedException()
-                };
+                using FileStream fs = new(colorChoice, FileMode.Open, FileAccess.Read);
+                using StreamReader reader = new(fs);
+                imageOptions.Colors = ColorManager.GetColors(reader);
             }
 
             ImageGenerator generator = new ImageGenerator(imageOptions, titleOptions);
