@@ -16,9 +16,9 @@ namespace PrettyGit
             }
         }
 
-        public static Range? GetBaseRange(this List<Range> collection, Range target)
+        public static List<Range>? GetIntersectingRanges(this List<Range> collection, Range target) 
         {
-            Range? value = collection.Where
+            List<Range>? intersectingRanges = collection.Where
                 (x =>
                     (x.StartPoint <= target.StartPoint &&
                     x.EndPoint >= target.StartPoint)
@@ -30,9 +30,14 @@ namespace PrettyGit
                     x.EndPoint <= target.EndPoint)
                 )
                 .OrderByDescending(x => x.YOffset)
-                .FirstOrDefault();
+                .ToList();
 
-            return value;
+            return intersectingRanges;
+        }
+
+        public static Range? GetBaseRange(this List<Range> collection, Range target)
+        {
+            return collection.GetIntersectingRanges(target).FirstOrDefault();
         }
 
         public static byte ToByte(this string value)

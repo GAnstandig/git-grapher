@@ -244,10 +244,14 @@ namespace PrettyGit
 
                 int yOffset;
 
-                if (knownRanges.GetBaseRange(branchRange) is Range range)
+                if (knownRanges.GetIntersectingRanges(branchRange) is List<Range> ranges && ranges.Any())
                 {
-                    yOffset = range.YOffset + 1;
+                    int parentOffset = branch.First().Parents.Min(x => x.yOffset);
+
+                    int lowestPoint = Enumerable.Range(parentOffset, ranges.Max(x => x.YOffset)+5).First(x=> !ranges.Any(y=>y.YOffset == x));
+                    yOffset = lowestPoint;
                 }
+
                 else
                 {
                     yOffset = 0;
