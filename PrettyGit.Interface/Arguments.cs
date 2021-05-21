@@ -40,7 +40,7 @@ namespace PrettyGit.Interface
         [ValueArgument(typeof(string), "outputDirectory", Description = "Directory to save graphic to")]
         public string OutputDirectory;
 
-        [EnumeratedValueArgument(typeof(TitleOptions.Location), "titlePosition", DefaultValue = TitleOptions.Location.BottomRight)]
+        [EnumeratedValueArgument(typeof(TitleOptions.Location), "titlePosition", DefaultValue = TitleOptions.Location.BottomRight, AllowedValues ="TopLeft;TopCenter;TopRight;RightEdge;BottomRight;BottomCenter;BottomLeft;LeftEdge")]
         public TitleOptions.Location TitleLocation;
 
         [ValueArgument(typeof(int), "horizontalTitleOffset", Description = "Distance from the left or right edge of the document to the title.", DefaultValue = 50)]
