@@ -8,52 +8,52 @@ namespace PrettyGit.Interface
 {
     internal class Arguments
     {
-        [FileArgument("filePath", Description = @"Path to the file containing repository log data. {git log --all --date-order --pretty=""%h|%p|"" > [file name here]}", FileMustExist = true, Optional = false)]
+        [FileArgument('f', "filePath", Description = @"Path to the file containing repository log data. {git log --all --date-order --pretty=""%h|%p|"" > [file name here]}", FileMustExist = true, Optional = false)]
         public FileInfo FilePathToReadFrom;
 
-        [ValueArgument(typeof(int), "initialWidth", Description = "Starting width of the image.", DefaultValue = 1920)]
+        [ValueArgument(typeof(string), 't', "title", Description = "Title of the image")]
+        public string ImageTitle;
+
+        [ValueArgument(typeof(string), 'o', "outputDirectory", Description = "Directory to save graphic to")]
+        public string OutputDirectory;
+
+        [ValueArgument(typeof(string), 'c', "colorPalette", Description = "path to the color palette file to use")]
+        public string ColorPalette;
+
+        //language=regex
+        [RegexValueArgument("titleColor", @"(\d+\,?){4}", Description = "Color of the title for the image in RGBA format", SampleValue = "70,70,70,255")]
+        public string TitleColor;
+
+        [EnumeratedValueArgument(typeof(TitleOptions.Location), 'p', "titlePosition", Description ="Location in the image to draw the title", DefaultValue = TitleOptions.Location.BottomRight, AllowedValues = "TopLeft;TopCenter;TopRight;RightEdge;BottomRight;BottomCenter;BottomLeft;LeftEdge")]
+        public TitleOptions.Location TitleLocation;
+
+        //language=regex
+        [RegexValueArgument("backgroundColor", @"(\d+\,?){4}", Description = "Color for the background of the image in RGBA format", SampleValue = "70,70,70,255")]
+        public string BackgroundColor;
+
+        [ValueArgument(typeof(int), 'w', "initialWidth", Description = "Starting width of the image.", DefaultValue = 1920)]
         public int ImageWidth;
 
-        [ValueArgument(typeof(int), "initialHeight", Description = "Starting height of the image.", DefaultValue = 1080)]
+        [ValueArgument(typeof(int), 'h', "initialHeight", Description = "Starting height of the image.", DefaultValue = 1080)]
         public int ImageHeight;
         
-        //language=regex
-        [RegexValueArgument("backgroundColor", @"(\d+\,?){4}", Description = "Color for the background of the image", SampleValue = "70,70,70,255")]
-        public string BackgroundColor;
+        [SwitchArgument('R', "noResize", true, Description = "Specify to disable dynamic resizing of the image" )]
+        public bool CanImageBeResized;
+
+        [SwitchArgument('k', "keepAspectRatio", true, Description = "Specify to lock the output image to the same aspect ratio as defined by initial height and width")]
+        public bool DoAxesScaleIndependently;
 
         [ValueArgument(typeof(int), "horizontalPadding", Description = "Minimum horizontal distance between points before image is scaled up on the X axis.", DefaultValue = 20)]
         public int HorizontalDistanceBetweenPoints;
-
+        
         [ValueArgument(typeof(int), "verticalPadding", Description = "Minimum vertical distance to edge of image before image is scaled up on the Y axis.", DefaultValue = 200)]
         public int VerticalDistanceToImageEdge;
 
-        [ValueArgument(typeof(bool),"canResize", Description = "Allow the image to be dynamically resized.", DefaultValue = true)]
-        public bool CanImageBeResized;
-
-        [ValueArgument(typeof(bool), "independentScaling", Description = "Allow the x and y axes to scale indepentently.", DefaultValue = true)]
-        public bool DoAxesScaleIndependently;
-
-        //language=regex
-        [RegexValueArgument("titleColor", @"(\d+\,?){4}", Description = "Color of the title for the image", SampleValue = "70,70,70,255")]
-        public string TitleColor;
-
-        [ValueArgument(typeof(string), "outputDirectory", Description = "Directory to save graphic to")]
-        public string OutputDirectory;
-
-        [EnumeratedValueArgument(typeof(TitleOptions.Location), "titlePosition", DefaultValue = TitleOptions.Location.BottomRight, AllowedValues ="TopLeft;TopCenter;TopRight;RightEdge;BottomRight;BottomCenter;BottomLeft;LeftEdge")]
-        public TitleOptions.Location TitleLocation;
-
-        [ValueArgument(typeof(int), "horizontalTitleOffset", Description = "Distance from the left or right edge of the document to the title.", DefaultValue = 50)]
+        [ValueArgument(typeof(int), "horizontalTitleOffset", Description = "Distance from the left or right edge of the image to the title.", DefaultValue = 50)]
         public int HorizontalOffset;
 
-        [ValueArgument(typeof(int), "verticalTitleOffset", Description = "Distance from the top or bottom edge of the document to the title.", DefaultValue = 50)]
+        [ValueArgument(typeof(int), "verticalTitleOffset", Description = "Distance from the top or bottom edge of the image to the title.", DefaultValue = 50)]
         public int VerticalOffset;
-
-        [ValueArgument(typeof(string), "title", Description = "Title of the image")]
-        public string ImageTitle;
-
-        [ValueArgument(typeof(string), "colorPalette", Description = "path to the color palette file to use")]
-        public string ColorPalette;
 
         internal static void ApplyCustomizations(Arguments arguments, ref ImageOptions image, ref TitleOptions title)
         {
