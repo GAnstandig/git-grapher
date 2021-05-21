@@ -143,7 +143,7 @@ namespace PrettyGit.Interface
 
                     MatchCollection matches = hashExtraction.Matches(line);
 
-                    Point[] currPts = matches.Select(x => pointMap[x.Value]).ToArray();
+                    Point[] currPts = matches.Where(x=>pointMap.ContainsKey(x.Value)).Select(x => pointMap[x.Value]).ToArray();
 
                     currPts.First().Parents.AddRange(currPts.Skip(1));
                     currPts.First().Parents.ForEach(x => x.Children.Add(currPts.First()));
