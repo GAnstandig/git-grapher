@@ -55,6 +55,9 @@ namespace PrettyGit.Interface
         [ValueArgument(typeof(int), "verticalTitleOffset", Description = "Distance from the top or bottom edge of the image to the title.", DefaultValue = 50)]
         public int VerticalOffset;
 
+        [SwitchArgument('I', "showIDs", false, Description = "show commit IDs on output graphic")]
+        public bool showIDs;
+
         internal static void ApplyCustomizations(Arguments arguments, ref ImageOptions image, ref TitleOptions title)
         {
             Regex colorExtraction = new Regex(@"(\d+)");

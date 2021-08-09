@@ -29,7 +29,7 @@ namespace PrettyGit
             }
             else
             {
-                HashSet<Point> children = new();
+                 HashSet<Point> children = new();
 
                 foreach (Point point in points)
                 {

@@ -31,7 +31,7 @@ namespace PrettyGit
             titleOptions = titleOpts;
         }
 
-        public Image GetImage(List<Point> points, string title = "")
+        public Image GetImage(List<Point> points, string title = "", bool WriteIDs = false)
         {
             imagePoints = points;
             pointOffsetX = imageOptions.InitialWidth / (imagePoints.Count * 2);
@@ -54,7 +54,7 @@ namespace PrettyGit
                     imageOptions.BackgroundColor
                 );
 
-            DrawGraph(image, imagePoints);
+            DrawGraph(image, imagePoints, WriteIDs);
 
             try
             {
@@ -186,6 +186,8 @@ namespace PrettyGit
 
             while (unassignedPoints.Any())
             {
+                Console.Write($"Grouped {points.Count - unassignedPoints.Count} out of {points.Count} points \t\t\r");
+
                 List<Point> branch;
 
                 if (Utilities.GetShortestPath(unassignedPoints.First(), finalPoint) is List<Point> values)
@@ -204,11 +206,11 @@ namespace PrettyGit
 
                 unassignedPoints.RemoveRange(branch);
                 branches.Add(branch);
-
-                Console.Write($"Plotted {points.Count - unassignedPoints.Count} out of {points.Count} points \t\t\r");
             }
 
             List<Range> knownRanges = new();
+
+            Console.WriteLine("Setting vertical offsets");
 
             foreach (List<Point> branch in branches)
             {
@@ -342,16 +344,16 @@ namespace PrettyGit
                 default:
                     throw new InvalidOperationException("Could not recognize title location selection!");
             }
-
-            TextGraphicsOptions tgo = new()
+            
+            DrawingOptions drawOpts = new()
             {
                 TextOptions = titleOptions
             };
 
-            image.Mutate(x => x.DrawText(tgo, title, titleOptions.Font, titleOptions.Color, new PointF(xOffset, yOffset)));
+            image.Mutate(x => x.DrawText(drawOpts, title, titleOptions.Font, titleOptions.Color, new PointF(xOffset, yOffset)));
         }
 
-        private void DrawGraph(Image image, List<Point> points)
+        private void DrawGraph(Image image, List<Point> points, bool drawIDs = false)
         {
             for (int i = 0; i < points.Count; i++)
             {
@@ -412,6 +414,18 @@ namespace PrettyGit
                 });
 
                 image.Mutate(x => x.Fill(point.Color, new EllipsePolygon(point.Location, 20)));
+
+                if (drawIDs)
+                {
+                    Font font = new(SystemFonts.Find("consolas"), 22, FontStyle.Italic);
+                    image.Mutate(x => x
+                        .SetDrawingTransform(Matrix3x2Extensions.CreateRotationDegrees(270, new PointF(point.xPosition, point.yPosition)))
+                        .DrawText(
+                            point.ID, 
+                            font, 
+                            new Rgb24(255, 0, 255), 
+                            new PointF(point.xPosition, point.yPosition-10)));
+                }
             }
         }
     }

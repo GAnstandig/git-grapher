@@ -88,8 +88,8 @@ namespace PrettyGit.Interface
             }
 
             ImageGenerator generator = new ImageGenerator(imageOptions, titleOptions);
-
-            Image image = generator.GetImage(points, title);
+            
+            Image image = generator.GetImage(points, title, arguments.showIDs);
 
             string outFilePath = string.Empty;
             if (!string.IsNullOrEmpty(arguments.OutputDirectory))
