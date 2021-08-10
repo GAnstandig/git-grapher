@@ -190,13 +190,13 @@ namespace PrettyGit
 
                 List<Point> branch;
 
-                if (Utilities.GetShortestPath(unassignedPoints.First(), finalPoint) is List<Point> values)
+                if (Utilities.GetShortestPath(unassignedPoints.First(), finalPoint, points) is List<Point> values)
                 {
                     branch = values;
                 }
                 else if (unassignedPoints.First().Children.Any())
                 {
-                    List<List<Point>> potentialPaths = endpoints.Select(x => Utilities.GetShortestPath(unassignedPoints.First(), x) ?? new List<Point>()).ToList();
+                    List<List<Point>> potentialPaths = endpoints.Select(x => Utilities.GetShortestPath(unassignedPoints.First(), x, points) ?? new List<Point>()).ToList();
                     branch = potentialPaths.OrderBy(x => x.Count).First(x => x.Count > 0);
                 }
                 else

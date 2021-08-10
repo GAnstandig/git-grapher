@@ -6,54 +6,68 @@ namespace PrettyGit
 {
     public static class Utilities
     {
-        public static List<Point>? GetShortestPath(Point origin, Point destination, List<Point>? points = null)
+        /// <summary>
+        /// Searches for shortest path (using Dijkstra's Algorithm) between <paramref name="origin"/> and <paramref name="destination"/> if one exists
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="destination"></param>
+        /// <param name="points"></param>
+        /// <returns></returns>
+        public static List<Point>? GetShortestPath(Point origin, Point destination, IEnumerable<Point> points)
         {
-            if (points is null)
-            {
-                points = new List<Point>() { origin };
-            }
+            HashSet<Point> queue = new(points);
+            Dictionary<Point, long> distance = new(points.Select(x => new KeyValuePair<Point, long>(x, long.MaxValue)));
+            Dictionary<Point, Point?> previous = new(points.Select(x => new KeyValuePair<Point, Point?>(x, null)));
+            
+            distance[origin] = 0;
 
-            if (points.Contains(destination))
+            bool found = false;
+            while (queue.Any())
             {
-                //backtrack from destination to find origin using values in points
-                List<Point> path = new() { destination };
-                Point next = destination;
+                (Point pt, long dist ) = distance.OrderBy(x => x.Value).First(x => queue.Contains(x.Key));
 
-                do
+                if (dist == long.MaxValue) 
                 {
-                    next = next.Parents.Where(x => points.Contains(x)).First();
-                    path.Add(next);
-                } while (next != origin);
+                    break;
+                }
 
-                return ((IEnumerable<Point>)path).Reverse().ToList();
-            }
-            else
-            {
-                 HashSet<Point> children = new();
-
-                foreach (Point point in points)
+                queue.Remove(pt);
+                if (pt.Equals(destination)) 
                 {
-                    point.Children.ForEach(x =>
+                    found = true;
+                    break;
+                }
+
+                foreach (Point child in pt.Children)
+                {
+                    long altDistance = distance[pt] + 1 < 0 ? long.MaxValue : distance[pt] + 1;
+                    
+                    if (altDistance < distance[child])
                     {
-                        if (!children.Contains(x))
-                        {
-                            children.Add(x);
-                        }
-                    });
-                }
-
-                if (children.Except(points).Any())
-                //add all previously-unknown children to points list and recurse
-                {
-                    points.AddRange(children);
-                    return GetShortestPath(origin, destination, points.Distinct().ToList());
-                }
-                else
-                //no more children so no path exists.
-                {
-                    return null;
+                        distance[child] = altDistance;
+                        previous[child] = pt;
+                    }
                 }
             }
+
+            List<Point>? shortestPath = null;
+
+            if (found) 
+            {
+                shortestPath = new();
+                Point? position = destination;
+
+                while (position is not null)
+                {
+                    shortestPath.Add(position);
+                    position = previous[position];
+                }
+
+                shortestPath.Reverse();
+            }
+
+            return shortestPath;
         }
+
     }
 }
