@@ -7,18 +7,20 @@ namespace PrettyGit
     public static class Utilities
     {
         /// <summary>
-        /// Searches for shortest path (using Dijkstra's Algorithm) between <paramref name="origin"/> and <paramref name="destination"/> if one exists
+        /// Searches for shortest path (using Dijkstra's Algorithm) between <paramref name="origin"/> and any <paramref name="destinations"/> if one exists
         /// </summary>
         /// <param name="origin"></param>
-        /// <param name="destination"></param>
+        /// <param name="destinations"></param>
         /// <param name="points"></param>
         /// <returns></returns>
-        public static List<Point>? GetShortestPath(Point origin, Point destination, IEnumerable<Point> points)
+        public static List<Point>? GetShortestPath(Point origin, IEnumerable<Point> destinations, IEnumerable<Point> points)
         {
             HashSet<Point> queue = new(points);
+            HashSet<Point> dests = new(destinations);
+
             Dictionary<Point, long> distance = new(points.Select(x => new KeyValuePair<Point, long>(x, long.MaxValue)));
             Dictionary<Point, Point?> previous = new(points.Select(x => new KeyValuePair<Point, Point?>(x, null)));
-            
+
             distance[origin] = 0;
 
             bool found = false;
@@ -32,7 +34,7 @@ namespace PrettyGit
                 }
 
                 queue.Remove(pt);
-                if (pt.Equals(destination)) 
+                if (destinations.Contains(pt)) 
                 {
                     found = true;
                     break;
@@ -55,7 +57,7 @@ namespace PrettyGit
             if (found) 
             {
                 shortestPath = new();
-                Point? position = destination;
+                Point? position = previous.First(x => x.Value is not null && destinations.Contains(x.Key)).Key;
 
                 while (position is not null)
                 {
@@ -68,6 +70,5 @@ namespace PrettyGit
 
             return shortestPath;
         }
-
     }
 }

@@ -181,7 +181,7 @@ namespace PrettyGit
 
             List<Point> endpoints = points.Where(x => !x.Children.Any()).Except(new List<Point>() { points.Last() }).ToList();
             List<Point> unassignedPoints = new(points);
-
+            List<Point> assignedPoints = new() { finalPoint };
             List<List<Point>> branches = new();
 
             while (unassignedPoints.Any())
@@ -190,20 +190,20 @@ namespace PrettyGit
 
                 List<Point> branch;
 
-                if (Utilities.GetShortestPath(unassignedPoints.First(), finalPoint, points) is List<Point> values)
+                if (Utilities.GetShortestPath(unassignedPoints.First(), assignedPoints, points) is List<Point> values)
                 {
                     branch = values;
                 }
                 else if (unassignedPoints.First().Children.Any())
                 {
-                    List<List<Point>> potentialPaths = endpoints.Select(x => Utilities.GetShortestPath(unassignedPoints.First(), x, points) ?? new List<Point>()).ToList();
-                    branch = potentialPaths.OrderBy(x => x.Count).First(x => x.Count > 0);
+                    branch = Utilities.GetShortestPath(unassignedPoints.First(), endpoints, points) ?? new List<Point>();
                 }
                 else
                 {
                     branch = new List<Point>() { unassignedPoints.First() };
                 }
 
+                assignedPoints.AddRange(branch);
                 unassignedPoints.RemoveRange(branch);
                 branches.Add(branch);
             }
