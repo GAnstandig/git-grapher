@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace PrettyGit.Interface
+namespace Interface
 {
     public static class Extensions
     {

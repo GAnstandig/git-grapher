@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PrettyGit
+namespace Core
 {
     public static class Utilities
     {
@@ -13,20 +13,20 @@ namespace PrettyGit
         /// <param name="destinations"></param>
         /// <param name="points"></param>
         /// <returns></returns>
-        public static List<Point>? GetShortestPath(Point origin, IEnumerable<Point> destinations, IEnumerable<Point> points)
+        public static List<Node>? GetShortestPath(Node origin, IEnumerable<Node> destinations, IEnumerable<Node> points)
         {
-            HashSet<Point> queue = new(points);
-            HashSet<Point> dests = new(destinations);
+            HashSet<Node> queue = new(points);
+            HashSet<Node> dests = new(destinations);
 
-            Dictionary<Point, long> distance = new(points.Select(x => new KeyValuePair<Point, long>(x, long.MaxValue)));
-            Dictionary<Point, Point?> previous = new(points.Select(x => new KeyValuePair<Point, Point?>(x, null)));
+            Dictionary<Node, long> distance = new(points.Select(x => new KeyValuePair<Node, long>(x, long.MaxValue)));
+            Dictionary<Node, Node?> previous = new(points.Select(x => new KeyValuePair<Node, Node?>(x, null)));
 
             distance[origin] = 0;
 
             bool found = false;
             while (queue.Any())
             {
-                (Point pt, long dist ) = distance.OrderBy(x => x.Value).First(x => queue.Contains(x.Key));
+                (Node pt, long dist ) = distance.OrderBy(x => x.Value).First(x => queue.Contains(x.Key));
 
                 if (dist == long.MaxValue) 
                 {
@@ -40,7 +40,7 @@ namespace PrettyGit
                     break;
                 }
 
-                foreach (Point child in pt.Children)
+                foreach (Node child in pt.Children)
                 {
                     long altDistance = distance[pt] + 1 < 0 ? long.MaxValue : distance[pt] + 1;
                     
@@ -52,12 +52,12 @@ namespace PrettyGit
                 }
             }
 
-            List<Point>? shortestPath = null;
+            List<Node>? shortestPath = null;
 
             if (found) 
             {
                 shortestPath = new();
-                Point? position = previous.First(x => x.Value is not null && destinations.Contains(x.Key)).Key;
+                Node? position = previous.First(x => x.Value is not null && destinations.Contains(x.Key)).Key;
 
                 while (position is not null)
                 {

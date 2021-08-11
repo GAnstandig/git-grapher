@@ -1,5 +1,5 @@
 ﻿using CommandLineParser.Exceptions;
-
+using Core;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -10,7 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace PrettyGit.Interface
+namespace Interface
 {
     public class Program
     {
@@ -69,7 +69,7 @@ namespace PrettyGit.Interface
 
             string sourceFile = arguments.FilePathToReadFrom?.FullName ?? string.Empty;
 
-            List<Point> points = GetPointsFromLog(sourceFile);
+            List<Node> points = GetPointsFromLog(sourceFile);
             points.Reverse();
 
             string title = arguments.ImageTitle ?? string.Empty;
@@ -89,7 +89,7 @@ namespace PrettyGit.Interface
 
             ImageGenerator generator = new ImageGenerator(imageOptions, titleOptions);
             
-            Image image = generator.GetImage(points, title, arguments.showIDs);
+            SixLabors.ImageSharp.Image image = generator.GetImage(points, title, arguments.showIDs);
 
             string outFilePath = string.Empty;
             if (!string.IsNullOrEmpty(arguments.OutputDirectory))
@@ -108,11 +108,11 @@ namespace PrettyGit.Interface
             return 0;
         }
 
-        private static List<Point> GetPointsFromLog(string logPath)
+        private static List<Node> GetPointsFromLog(string logPath)
         {
             Regex hashExtraction = new("[a-f0-9]+(?=.*\\|)");
 
-            Dictionary<string, Point> pointMap = new();
+            Dictionary<string, Node> pointMap = new();
 
             using (FileStream fs = new(logPath, FileMode.Open, FileAccess.Read))
             {
@@ -120,7 +120,7 @@ namespace PrettyGit.Interface
 
                 while (!sr.EndOfStream)
                 {
-                    //creating id-to-point map
+                    //creating id-to-Core.Point map
                     string? line = sr.ReadLine();
 
                     MatchCollection matches = hashExtraction.Matches(line);
@@ -128,7 +128,7 @@ namespace PrettyGit.Interface
                     string key = matches.First().Value;
                     if (!pointMap.ContainsKey(key))
                     {
-                        Point pt = new(key);
+                        Node pt = new(key);
                         pointMap.Add(key, pt);
                     }
                 }
@@ -138,12 +138,12 @@ namespace PrettyGit.Interface
 
                 while (!sr.EndOfStream)
                 {
-                    //building inter-point relationships
+                    //building inter-Core.Point relationships
                     string? line = sr.ReadLine();
 
                     MatchCollection matches = hashExtraction.Matches(line);
 
-                    Point[] currPts = matches.Where(x=>pointMap.ContainsKey(x.Value)).Select(x => pointMap[x.Value]).ToArray();
+                    Node[] currPts = matches.Where(x=>pointMap.ContainsKey(x.Value)).Select(x => pointMap[x.Value]).ToArray();
 
                     currPts.First().Parents.AddRange(currPts.Skip(1));
                     currPts.First().Parents.ForEach(x => x.Children.Add(currPts.First()));

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace PrettyGit
+namespace Core
 {
     public static class Extensions
     {

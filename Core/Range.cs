@@ -1,4 +1,4 @@
-﻿namespace PrettyGit
+﻿namespace Core
 {
     public class Range
     {

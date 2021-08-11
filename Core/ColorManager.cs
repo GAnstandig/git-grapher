@@ -7,7 +7,7 @@ using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace PrettyGit
+namespace Core
 {
     public static class ColorManager
     {

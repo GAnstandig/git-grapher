@@ -2,7 +2,7 @@
 using SixLabors.ImageSharp.PixelFormats;
 using System.Collections.Generic;
 
-namespace PrettyGit
+namespace Core
 {
     /// <summary>
     /// Options for image generation

@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PrettyGit\PrettyGit.Core.csproj" />
+    <ProjectReference Include="..\Core\GitGrapher.Core.csproj" />
   </ItemGroup>
 
 </Project>

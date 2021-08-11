@@ -2,7 +2,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 
-namespace PrettyGit
+namespace Core
 {
     public class TitleOptions : TextOptions
     {

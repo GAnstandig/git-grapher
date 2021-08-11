@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace PrettyGit
+namespace Core
 {
-    public class Point : IEquatable<Point>
+    public class Node : IEquatable<Node>
     {
         /// <summary>
         /// ID of the point
@@ -29,10 +29,10 @@ namespace PrettyGit
         /// <summary>
         /// List of point objects that this object is a child of
         /// </summary>
-        public List<Point> Parents { get; } = new();
-        public List<Point> Children { get; } = new();
+        public List<Node> Parents { get; } = new();
+        public List<Node> Children { get; } = new();
 
-        public Point(string id)
+        public Node(string id)
         {
             ID = id;
         }
@@ -47,9 +47,9 @@ namespace PrettyGit
             return ID;
         }
 
-        public List<Point> GetDescendants()
+        public List<Node> GetDescendants()
         {
-            List<Point> descendants = new(Children);
+            List<Node> descendants = new(Children);
 
             foreach (var child in Children)
             {
@@ -59,7 +59,7 @@ namespace PrettyGit
             return descendants;
         }
 
-        public bool Equals([AllowNull] Point other)
+        public bool Equals([AllowNull] Node other)
         {
             if (other is null)
             {

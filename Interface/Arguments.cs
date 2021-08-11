@@ -1,10 +1,11 @@
 ﻿using CommandLineParser.Arguments;
+using Core;
 using SixLabors.ImageSharp.PixelFormats;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace PrettyGit.Interface
+namespace Interface
 {
     internal class Arguments
     {

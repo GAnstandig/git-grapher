@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PrettyGit
+namespace Core
 {
     public class ImageGenerator
     {
@@ -22,8 +22,8 @@ namespace PrettyGit
 
         private float pointOffsetX = 0;
 
-        private List<List<Point>> pointGroups = new();
-        private List<Point> imagePoints = new();
+        private List<List<Node>> pointGroups = new();
+        private List<Node> imagePoints = new();
 
         public ImageGenerator(ImageOptions imageOpts, TitleOptions? titleOpts)
         {
@@ -31,7 +31,7 @@ namespace PrettyGit
             titleOptions = titleOpts;
         }
 
-        public Image GetImage(List<Point> points, string title = "", bool WriteIDs = false)
+        public Image GetImage(List<Node> points, string title = "", bool WriteIDs = false)
         {
             imagePoints = points;
             pointOffsetX = imageOptions.InitialWidth / (imagePoints.Count * 2);
@@ -68,7 +68,7 @@ namespace PrettyGit
             return image;
         }
 
-        private void SetColors(List<List<Point>> pointGroups)
+        private void SetColors(List<List<Node>> pointGroups)
         {
             Random rng = new();
             Dictionary<Color, int> occurrencesByColor = new();
@@ -78,7 +78,7 @@ namespace PrettyGit
                 occurrencesByColor.Add(color, 0);
             }
 
-            foreach (List<Point> group in pointGroups)
+            foreach (List<Node> group in pointGroups)
             {
                 List<Color> rarestColors = occurrencesByColor
                     .Where(x => x.Value == occurrencesByColor[occurrencesByColor.OrderByDescending(y => y.Value).Last().Key])
@@ -89,7 +89,7 @@ namespace PrettyGit
 
                 occurrencesByColor[nextColor]++;
 
-                foreach (Point p in group)
+                foreach (Node p in group)
                 {
                     p.Color = nextColor;
                 }
@@ -100,7 +100,7 @@ namespace PrettyGit
         /// Converts point offset data to point location data
         /// </summary>
         /// <param name="points">List of points to generate location data for</param>
-        private void Plot(List<Point> points, bool accountForTitle)
+        private void Plot(List<Node> points, bool accountForTitle)
         {
             int usableSpace;
             if (accountForTitle)
@@ -120,7 +120,7 @@ namespace PrettyGit
 
             int bottomLine = upperPadding + usedSpace;
 
-            foreach (Point p in points)
+            foreach (Node p in points)
             {
                 //assign X axis value
                 p.xPosition = p.xOffset / (float)points.Count * (imageOptions.InitialWidth * widthMultiplier) - pointOffsetX;
@@ -161,11 +161,11 @@ namespace PrettyGit
             }
         }
 
-        private void SetHorizontalOffsets(List<Point> points)
+        private void SetHorizontalOffsets(List<Node> points)
         {
             for (int i = 0; i < points.Count; i++)
             {
-                Point current = points[i];
+                Node current = points[i];
 
                 if (current.xPosition == 0)
                 {
@@ -174,33 +174,33 @@ namespace PrettyGit
             }
         }
 
-        private void SetVerticalOffsets(List<Point> points)
+        private void SetVerticalOffsets(List<Node> points)
         {
-            Point originPoint = points.First();
-            Point finalPoint = points.Last();
+            Node originPoint = points.First();
+            Node finalPoint = points.Last();
 
-            List<Point> endpoints = points.Where(x => !x.Children.Any()).Except(new List<Point>() { points.Last() }).ToList();
-            List<Point> unassignedPoints = new(points);
-            List<Point> assignedPoints = new() { finalPoint };
-            List<List<Point>> branches = new();
+            List<Node> endpoints = points.Where(x => !x.Children.Any()).Except(new List<Node>() { points.Last() }).ToList();
+            List<Node> unassignedPoints = new(points);
+            List<Node> assignedPoints = new() { finalPoint };
+            List<List<Node>> branches = new();
 
             while (unassignedPoints.Any())
             {
                 Console.Write($"Grouped {points.Count - unassignedPoints.Count} out of {points.Count} points \t\t\r");
 
-                List<Point> branch;
+                List<Node> branch;
 
-                if (Utilities.GetShortestPath(unassignedPoints.First(), assignedPoints, points) is List<Point> values)
+                if (Utilities.GetShortestPath(unassignedPoints.First(), assignedPoints, points) is List<Node> values)
                 {
                     branch = values;
                 }
                 else if (unassignedPoints.First().Children.Any())
                 {
-                    branch = Utilities.GetShortestPath(unassignedPoints.First(), endpoints, points) ?? new List<Point>();
+                    branch = Utilities.GetShortestPath(unassignedPoints.First(), endpoints, points) ?? new List<Node>();
                 }
                 else
                 {
-                    branch = new List<Point>() { unassignedPoints.First() };
+                    branch = new List<Node>() { unassignedPoints.First() };
                 }
 
                 assignedPoints.AddRange(branch);
@@ -212,9 +212,9 @@ namespace PrettyGit
 
             Console.WriteLine("Setting vertical offsets");
 
-            foreach (List<Point> branch in branches)
+            foreach (List<Node> branch in branches)
             {
-                List<Point> newBranch = new(branch.Where(x => x.yOffset < 0));
+                List<Node> newBranch = new(branch.Where(x => x.yOffset < 0));
 
                 pointGroups.Add(newBranch);
 
@@ -267,7 +267,7 @@ namespace PrettyGit
                     yOffset = 0;
                 }
 
-                foreach (Point pt in newBranch)
+                foreach (Node pt in newBranch)
                 {
                     pt.yOffset = yOffset;
                 }
@@ -353,11 +353,11 @@ namespace PrettyGit
             image.Mutate(x => x.DrawText(drawOpts, title, titleOptions.Font, titleOptions.Color, new PointF(xOffset, yOffset)));
         }
 
-        private void DrawGraph(Image image, List<Point> points, bool drawIDs = false)
+        private void DrawGraph(Image image, List<Node> points, bool drawIDs = false)
         {
             for (int i = 0; i < points.Count; i++)
             {
-                Point point = points[i];
+                Node point = points[i];
 
                 Color lineColor;
 
